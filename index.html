@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="config.js"></script>
     <title>Document</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -27,7 +29,7 @@
         let uv = 0;
 
         var myHeaders = new Headers();
-        myHeaders.append("x-access-token", "openuv-1rmfhrmceh92m8-io");
+        myHeaders.append("x-access-token", OPENUV_API_KEY);
         myHeaders.append("Content-Type", "application/json");
 
         var requestOptions = {
@@ -60,7 +62,7 @@
                 const safeTime = data.result.safe_exposure_time["st" + huidtype];
                 x.innerHTML = `${advies}<br><br>Veilige zonblootstelling: ongeveer ${safeTime} minuten voor huidtype ${huidtype}.`;
             })
-            .catch(error => console.log('error', error));
+            .catch(error => x.innerHTML = "Je hebt geen requests over lol");
 
         }
 
