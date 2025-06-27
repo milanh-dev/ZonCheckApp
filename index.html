@@ -8,17 +8,39 @@
 </head>
 <body>
     <button onclick="getLocation()">Gebruik mijn locatie</button>
+    <select id="skinType">
+        <option value="1">Type 1 – Zeer licht (verbrandt altijd, wordt niet bruin)</option>
+        <option value="2">Type 2 – Licht (verbrandt snel, wordt lichtbruin)</option>
+        <option value="3">Type 3 – Licht getint (verbrandt soms, wordt bruin)</option>
+        <option value="4">Type 4 – Getint (verbrandt zelden, wordt snel bruin)</option>
+        <option value="5">Type 5 – Donker (verbrandt zelden, wordt goed bruin)</option>
+        <option value="6">Type 6 – Zeer donker (verbrandt bijna nooit)</option>
+    </select>
     <div id="spinner"></div>
     <p id="output"></p>
+    <p id="error"></p>
 
     <script>
         const x = document.getElementById("output");
+        const e = document.getElementById("output");
         const spinner = document.getElementById("spinner");
+        let uv = 0;
+
+        var myHeaders = new Headers();
+        myHeaders.append("x-access-token", "openuv-1rmfhrmceh92m8-io");
+        myHeaders.append("Content-Type", "application/json");
+
+        var requestOptions = {
+            method: 'GET',
+            headers: myHeaders,
+            redirect: 'follow'
+        };
 
         function getLocation() {
             if (navigator.geolocation) {
                 spinner.style.display = "inline-block";
                 x.innerHTML = "";
+                e.innerHTML = "";
                 navigator.geolocation.getCurrentPosition(success, error);
             } else { 
                 x.innerHTML = "Geolocation is not supported by this browser.";
@@ -26,16 +48,41 @@
         }
 
         function success(position) {
+            console.log(position.coords.latitude, position.coords.longitude);
             spinner.style.display = "none";
-            x.innerHTML = "Latitude: " + position.coords.latitude + 
-            "<br>Longitude: " + position.coords.longitude;
-            x.style.color = "black";
+
+            fetch("https://api.openuv.io/api/v1/uv?lat=" + position.coords.latitude + "&lng=" + position.coords.longitude + "&alt=100&dt=", requestOptions)
+            .then(response => response.json())
+            .then(data => {
+                uv = data.result.uv;
+                const huidtype = document.getElementById("skinType").value;
+                const advies = checkZonbescherming(uv);
+                const safeTime = data.result.safe_exposure_time["st" + huidtype];
+                x.innerHTML = `${advies}<br><br>Veilige zonblootstelling: ongeveer ${safeTime} minuten voor huidtype ${huidtype}.`;
+            })
+            .catch(error => console.log('error', error));
+
         }
 
         function error() {
             spinner.style.display = "none";
-            x.innerHTML = "Error: location was not found";
-            x.style.color = "red";
+            e.innerHTML = "Error: location was not found";
+        }    
+
+        function checkZonbescherming(uv) {
+            if (uv < 0) {
+                return "Ongeldige UV-index.";
+            } else if (uv < 3) {
+                return "UV-index is laag. Je hoeft je meestal niet in te smeren, behalve bij langdurige blootstelling op reflecterende oppervlakken zoals sneeuw of water.";
+            } else if (uv < 6) {
+                return "UV-index is matig. Smeer je in, draag een zonnebril en zoek schaduw op tijdens piekuren.";
+            } else if (uv < 8) {
+                return "UV-index is hoog. Gebruik zonnebrand (minimaal SPF 30), draag beschermende kleding en vermijd de zon tussen 12:00 en 15:00.";
+            } else if (uv < 11) {
+                return "UV-index is zeer hoog. Smeer je goed in, blijf uit directe zon en draag beschermende kleding.";
+            } else {
+                return "UV-index is extreem. Blijf zoveel mogelijk binnen, bescherm elke stukje huid als je naar buiten moet.";
+            }
         }
     </script>
 </body>
