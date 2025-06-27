@@ -3,26 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zonchechapp</title>
+    <title>Document</title>
 </head>
 <body>
     <button onclick="getLocation()">Gebruik mijn locatie</button>
-    <p>Normale huid – in balans, niet te vet of droog <br>
 
-Vette huid – glimt snel, vooral op T-zone, neiging tot puistjes <br>
-
-Droge huid – trekkerig, schilferig, weinig talgproductie <br>
-
-Gecombineerde huid – vette T-zone + droge of normale wangen <br>
-
-Gevoelige huid – snel rood, reageert op producten of weersinvloeden</p>
     <p id="output"></p>   
 
     <script>
         const x = document.getElementById("output");
+        const spinner = document.getElementById("spinner");
 
         function getLocation() {
             if (navigator.geolocation) {
+                spinner.style.display = "inline-block";
+                x.innerHTML = "";
                 navigator.geolocation.getCurrentPosition(success, error);
             } else { 
                 x.innerHTML = "Geolocation is not supported by this browser.";
@@ -30,12 +25,14 @@ Gevoelige huid – snel rood, reageert op producten of weersinvloeden</p>
         }
 
         function success(position) {
+            spinner.style.display = "none";
             x.innerHTML = "Latitude: " + position.coords.latitude + 
             "<br>Longitude: " + position.coords.longitude;
             x.style.color = "black";
         }
 
         function error() {
+            spinner.style.display = "none";
             x.innerHTML = "Error: location was not found";
             x.style.color = "red";
         }
