@@ -1,0 +1,1 @@
+const OPENUV_API_KEY = "blablabla";
