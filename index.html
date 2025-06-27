@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button onclick="getLocation()">Gebruik mijn locatie</button>
+
+    <p id="output"></p>   
+
+    <script>
+        const x = document.getElementById("output");
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(success, error);
+            } else { 
+                x.innerHTML = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        function success(position) {
+            x.innerHTML = "Latitude: " + position.coords.latitude + 
+            "<br>Longitude: " + position.coords.longitude;
+            x.style.color = "black";
+        }
+
+        function error() {
+            x.innerHTML = "Error: location was not found";
+            x.style.color = "red";
+        }
+    </script>
+</body>
+</html>
